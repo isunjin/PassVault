@@ -25,6 +25,7 @@ namespace PassVault.Models
 
         protected override void OnCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
+            base.OnCollectionChanged(e);
             var database = CredentialDatabaseFactory.OpenDefault();
             database.Save(this.password, this.Where(c => c.Password != null && c.UserName != null).ToList());
         }

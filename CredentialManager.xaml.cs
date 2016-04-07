@@ -44,7 +44,10 @@ namespace PassVault
                     e.Cancel = false;
                 }
             }
-            e.Cancel = true;
+            else
+            {
+                e.Cancel = true;
+            }
         }
     }
 }
