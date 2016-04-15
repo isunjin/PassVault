@@ -27,7 +27,7 @@ namespace PassVault.Models
         {
             base.OnCollectionChanged(e);
             var database = CredentialDatabaseFactory.OpenDefault();
-            database.Save(this.password, this.Where(c => c.Password != null && c.UserName != null).ToList());
+            database.Save(this.password, this.Where(c => !string.IsNullOrEmpty(c.Password) && !string.IsNullOrEmpty(c.UserName)).ToList());
         }
     }
 }

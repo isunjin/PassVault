@@ -22,7 +22,7 @@ namespace PassVault
     /// </summary>
     public partial class CredentialManager : UserControl
     {
-        private string password;
+        private UIModel model;
 
         public CredentialManager()
         {
@@ -31,22 +31,83 @@ namespace PassVault
 
         public void Refresh(string password)
         {
-            this.valt.ItemsSource = new UIModel(password);
+            this.model = new UIModel(password);
+            this.valt.ItemsSource = this.model;
         }
 
-        private void valt_RowEditEnding(object sender, DataGridRowEditEndingEventArgs e)
+        private DataGridRow FindDataGridRow(MouseButtonEventArgs e)
         {
-            if(e.EditAction ==  DataGridEditAction.Commit)
+            DataGridRow row = null;
+
+            DependencyObject dep = (DependencyObject)e.OriginalSource;
+
+            // iteratively traverse the visual tree
+            while ((dep != null) && !(dep is DataGridCell))
             {
-                var item = e.Row.Item as CredentialEntity;
-                if (item != null && item.Password != null && item.Password != null)
+                dep = VisualTreeHelper.GetParent(dep);
+            }
+
+            if (dep == null)
+            {
+                return null;
+            }
+
+            if (dep is DataGridCell)
+            {
+                DataGridCell cell = dep as DataGridCell;
+
+                while ((dep != null) && !(dep is DataGridRow))
                 {
-                    e.Cancel = false;
+                    dep = VisualTreeHelper.GetParent(dep);
+                }
+
+                row = dep as DataGridRow;
+            }
+
+            return row;
+        }
+
+        private void Delete_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            var row = FindDataGridRow(e);
+            if(row!=null && row.Item!=null)
+            {
+                var entity = row.Item as CredentialEntity;
+                if (entity != null)
+                {
+                    var window = Application.Current.Windows.OfType<Window>().SingleOrDefault(x => x.IsActive); 
+                    if(MessageBox.Show(window, "Are you sure to delete this item?", "Remove item", MessageBoxButton.YesNoCancel) == MessageBoxResult.Yes)
+                    {
+                        this.model.Remove(entity);
+                    }
                 }
             }
-            else
+        }
+
+        private void Copy_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            var row = FindDataGridRow(e);
+            if (row != null && row.Item != null)
             {
-                e.Cancel = true;
+                var entity = row.Item as CredentialEntity;
+                if (entity != null)
+                {
+                    Clipboard.SetText(entity.Password);
+                }
+            }
+        }
+
+        private void addNew_Click(object sender, RoutedEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(this.userName.Text) && !string.IsNullOrEmpty(this.passWord.Text))
+            {
+                this.model.Add(new CredentialEntity()
+                {
+                    UserName = this.userName.Text,
+                    Password = this.passWord.Text
+                });
+
+                this.passWord.Text = string.Empty;
             }
         }
     }

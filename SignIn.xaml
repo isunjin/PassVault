@@ -10,8 +10,8 @@
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <PasswordBox x:Name="passwordBox" Width="200" Height="25"></PasswordBox>
                 <Button x:Name="login" Margin="20,0,0,0" Width="50" Content="Login" Click="login_Click"></Button>
-                <TextBlock x:Name="signUp"  Margin="20,0,0,0" Text="SignUp" VerticalAlignment="Center" 
-                       HorizontalAlignment="Center" FontStyle="Italic" Foreground="#FF152155" MouseLeftButtonUp="signUp_MouseLeftButtonUp"/>
+                <!--<TextBlock x:Name="signUp"  Margin="20,0,0,0" Text="SignUp" VerticalAlignment="Center" 
+                       HorizontalAlignment="Center" FontStyle="Italic" Foreground="#FF152155" MouseLeftButtonUp="signUp_MouseLeftButtonUp"/>-->
             </StackPanel>
         </StackPanel>
         
