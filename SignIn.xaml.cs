@@ -31,23 +31,29 @@ namespace PassVault
         public SignIn()
         {
             InitializeComponent();
+            this.Loaded += SignIn_Loaded;
         }
 
-        private void login_Click(object sender, RoutedEventArgs e)
+        void SignIn_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.passwordBox.Focus();
+        }
+
+        private void Login()
         {
             var password = passwordBox.Password;
-            Task.Run(()=>
+            Task.Run(() =>
             {
                 var credentialDatabase = CredentialDatabaseFactory.OpenDefault();
-                if(credentialDatabase.CheckPassword(password))
+                if (credentialDatabase.CheckPassword(password))
                 {
-                    if(PasswordRecieved!=null)
+                    if (PasswordRecieved != null)
                     {
-                        Dispatcher.BeginInvoke(new Action(()=>
+                        Dispatcher.BeginInvoke(new Action(() =>
                         {
                             PasswordRecieved(this, new PasswordEventArgs()
                             {
-                                  Password = password
+                                Password = password
                             });
                         }));
                     }
@@ -57,6 +63,11 @@ namespace PassVault
                     MessageBox.Show("Incorrect password", "Incorrect password", MessageBoxButton.OK);
                 }
             });
+        }
+
+        private void login_Click(object sender, RoutedEventArgs e)
+        {
+            this.Login();
         }
 
         private void signUp_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -77,6 +88,14 @@ namespace PassVault
                         Password = e.Password
                     });
                 }));
+            }
+        }
+
+        private void passwordBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Return)
+            {
+                this.Login();
             }
         }
     }
