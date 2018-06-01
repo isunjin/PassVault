@@ -9,7 +9,7 @@ namespace PassVault.Models
 {
     class UIModel : ObservableCollection<CredentialEntity>
     {
-        private string password;
+        public string password;
 
         public UIModel(string password)
         {

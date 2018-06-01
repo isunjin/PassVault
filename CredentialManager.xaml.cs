@@ -14,6 +14,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Collections.ObjectModel;
+using System.IO;
+using Microsoft.Win32;
 
 namespace PassVault
 {
@@ -109,6 +111,59 @@ namespace PassVault
 
                 this.passWord.Text = string.Empty;
             }
+        }
+
+        private void HandleFile(Action<String> action)
+        {
+            String myFile = null;
+            OpenFileDialog openFileDialog1 = new OpenFileDialog();
+
+            if (openFileDialog1.ShowDialog() == true)
+            {
+                try
+                {
+                    if ((myFile = openFileDialog1.FileName) != null)
+                    {
+                        action(myFile);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error: Could not read file from disk. Original error: " + ex.Message);
+                }
+            }
+        }
+
+        private void encrypt_Click(object sender, RoutedEventArgs e)
+        {
+            this.HandleFile((s) =>
+            {
+                var data = File.ReadAllBytes(s);
+                AESCryptographer crypt = new AESCryptographer();
+                var salt = UTF8Encoding.UTF8.GetBytes(this.model.password.PadRight(16, 'x'));
+                var encryptedData = crypt.Encrypt(this.model.password, data, salt);
+
+                File.WriteAllBytes(s+".eee", encryptedData);
+
+                MessageBox.Show("done");
+            });
+        }
+
+        private void decrypt_Click(object sender, RoutedEventArgs e)
+        {
+            this.HandleFile((s) =>
+            {
+                if (s.EndsWith(".eee"))
+                {
+                    var data = File.ReadAllBytes(s);
+                    AESCryptographer crypt = new AESCryptographer();
+                    var salt = UTF8Encoding.UTF8.GetBytes(this.model.password.PadRight(16, 'x'));
+                    var decryptedData = crypt.Decrypt(this.model.password, data, salt);
+
+                    File.WriteAllBytes(s.Substring(0, s.Length - 4) + ".1", decryptedData);
+                    MessageBox.Show("done");
+                }
+            });
         }
     }
 }
